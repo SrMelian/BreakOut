@@ -35,6 +35,9 @@ let heightBallPosition;
 
 let heightBall = 16;
 
+/**
+ * 4% of the total width
+ */
 let sizeText;
 
 let heightTextPosition;

@@ -27,8 +27,8 @@ let score = 0;
  *
  */
 function preload() {
-    game.load.atlas('bricks', 'BreakOut/resources/breakout.png',
-        'BreakOut/resources/breakout.json');
+    game.load.atlas('bricks', 'resources/breakout.png',
+        '/BreakOut/resources/breakout.json');
     game.load.image('background', 'BreakOut/resources/background.jpg');
     game.load.image('paddle', 'BreakOut/resources/paddle.png');
     game.load.bitmapFont('atari',

@@ -28,11 +28,11 @@ let score = 0;
  */
 function preload() {
     game.load.atlas('bricks', 'resources/breakout.png',
-        '/BreakOut/resources/breakout.json');
-    game.load.image('background', 'BreakOut/resources/background.jpg');
-    game.load.image('paddle', 'BreakOut/resources/paddle.png');
+        'resources/breakout.json');
+    game.load.image('background', 'resources/background.jpg');
+    game.load.image('paddle', 'resources/paddle.png');
     game.load.bitmapFont('atari',
-    'BreakOut/resources/Atari.png', 'BreakOut/resources/Atari.fnt');
+    'resources/Atari.png', 'resources/Atari.fnt');
 }
 
 /**

@@ -107,7 +107,7 @@ function create() {
         fill: '#ffffff',
     });
 
-    let livesText = game.add.text(widthTextLivesPosition,
+    livesText = game.add.text(widthTextLivesPosition,
         heightTextPosition, 'Lives: 3', {
             font: `${sizeText}px atari`,
             fill: '#ffffff',
@@ -138,15 +138,16 @@ function update() {
     // Control limits
     if (paddle.x < 0) {
         paddle.x = 0;
-    } else if (paddle.x > game.width - 60) {
-        paddle.x = game.width - 60;
+    } else if (paddle.x > game.width - widthPaddle) {
+        paddle.x = game.width - widthPaddle;
     }
 
     if (ballOnPaddle) {
-        ball.body.x = paddle.x;
+        ball.body.x = paddle.x + widthPaddle / 2;
     } else {
-        game.physics.arcade.collide(ball, paddle, ballHitPaddle, null, this);
-        game.physics.arcade.collide(ball, bricks, ballHitBrick, null, this);
+        game.physics.arcade.collide(ball, paddle,
+            collisionBallPaddle, null, this);
+        // game.physics.arcade.collide(ball, bricks, collisionBallBricks, null, this);
     }
 }
 
@@ -167,7 +168,7 @@ function ballOutOfBounds() {
     livesText.text = `Lives: ${lives}`;
 
     if (lives == 0) {
-        gameOver();
+        // gameOver();
     } else {
         ballOnPaddle = true;
 
@@ -184,6 +185,27 @@ function shootBall() {
         ball.body.velocity.y = -300;
         ball.body.velocity.x = -75;
         insertCoinText.visible = false;
+    }
+}
+
+/**
+ *
+ */
+function collisionBallPaddle() {
+    let diff = 0;
+
+    if (ball.x < paddle.centerX) {
+        // Ball is on the left-hand side of the paddle
+        diff = paddle.centerX - ball.x;
+        ball.body.velocity.x = (-5 * diff);
+    } else if (ball.x > paddle.x) {
+        // Ball is on the right-hand side of the paddle
+        diff = ball.x - paddle.x;
+        ball.body.velocity.x = (5 * diff);
+    } else {
+        //  Ball is perfectly in the middle
+        //  Add a little random X to stop it bouncing straight up!
+        ball.body.velocity.x = 2 + Math.random() * 8;
     }
 }
 

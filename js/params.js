@@ -16,6 +16,8 @@ let heightPaddlePosition;
  */
 let widthPaddlePosition;
 
+let widthPaddle = 60;
+
 let brickWidth = 32;
 
 let brickHeight = 16;
@@ -28,8 +30,6 @@ let distanceWithLateralBounds;
 let distanceWithTopBound;
 
 let distanceBetweenBricks = 30;
-
-let widthPaddle = 60;
 
 let heightBallPosition;
 

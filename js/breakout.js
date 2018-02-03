@@ -47,6 +47,7 @@ function preload() {
     game.load.image('paddle', 'resources/paddle.png');
     game.load.bitmapFont('atari',
         'resources/Atari.png', 'resources/Atari.fnt');
+    loadLevels();
 }
 
 /**
@@ -74,25 +75,7 @@ function create() {
     // </Paddle>
 
     // <Bricks>
-    bricks = game.add.group();
-    bricks.enableBody = true;
-    bricks.physicsBodyType = Phaser.Physics.ARCADE;
-
-    let brick;
-
-    for (let i = 0; i < rows; i++) {
-        for (let j = 0; j < columns; j++) {
-            brick = bricks.create(
-                // x
-                distanceWithLateralBounds + (j * brickWidth),
-                // y
-                distanceWithTopBound + (i * distanceBetweenBricks),
-                'bricks', `brick_${i + 1}_1.png`
-            );
-            brick.body.bounce.set(1);
-            brick.body.immovable = true;
-        }
-    }
+    printLevel(0);
     // </Bricks>
 
     // <Ball>
@@ -246,7 +229,21 @@ function collisionBallBricks(_ball, brick) {
         ball.y = paddle.y - 16;
 
         //  And bring the bricks back from the dead :)
-        bricks.callAll('revive');
+        nextLevel();
+        game.input.onDown.add(shootBall, this);
+    }
+}
+
+/**
+ *
+ */
+function nextLevel() {
+    if (currentLevel >= 3) {
+        gameWin();
+    }
+    if (currentLevel <= 2) {
+        currentLevel++;
+        printLevel(currentLevel);
     }
 }
 
@@ -278,18 +275,39 @@ function loadLevels() {
         {
             name: 'letsa begin',
             bricks: [
-                [r, r, r, r, r, r, r, r, r],
-                [X, X, r, X, X, r, X, X, r],
-                [X, r, r, X, r, r, X, r, r],
-                [X, X, r, X, X, r, X, X, r],
-                [g, g, g, g, g, g, g, g, g],
-                [X, X, g, X, X, g, X, X, g],
-                [X, g, g, X, g, g, X, g, g],
-                [X, X, g, X, X, g, X, X, g],
-                [o, o, o, o, o, o, o, o, o],
-                [X, X, o, X, X, o, X, X, o],
-                [X, o, o, X, o, o, X, o, o],
-                [X, X, o, X, X, o, X, X, o],
+                [X, X, X, X, X, X, X, X, X, X, X, X, X],
+                [X, X, X, X, X, X, X, X, X, X, X, X, X],
+                [X, X, X, X, X, X, X, X, X, X, X, X, X],
+                [X, X, X, X, X, X, X, X, X, X, X, X, X],
+                [X, X, X, X, X, X, X, X, X, X, X, X, X],
+                [X, X, X, X, X, X, X, X, X, X, X, X, X],
+                [X, X, X, X, X, X, X, X, X, X, X, X, X],
+                [X, X, X, X, X, X, X, X, X, X, X, X, X],
+                [X, X, X, X, X, X, X, X, X, X, X, X, X],
+                [X, X, X, X, X, X, X, X, X, X, X, X, X],
+                [X, X, X, X, X, X, X, X, X, X, X, X, X],
+                [X, X, X, X, X, X, X, X, X, X, X, X, X],
+                [X, X, X, X, X, X, X, X, X, X, X, o, X],
+            ],
+            powerUps: 1,
+            powerDowns: 1,
+        },
+        {
+            name: 'letsa begin',
+            bricks: [
+                [r, r, r, r, r, r, r, r, r, r, r, r, r],
+                [X, X, r, X, X, r, X, X, r, X, X, r, X],
+                [X, r, r, X, r, r, X, r, r, X, r, r, X],
+                [X, X, r, X, X, r, X, X, r, X, X, r, X],
+                [g, g, g, g, g, g, g, g, g, g, g, g, g],
+                [X, g, X, X, g, X, X, g, X, X, g, X, X],
+                [X, g, g, X, g, g, X, g, g, X, g, g, X],
+                [X, g, X, X, g, X, X, g, X, X, g, X, X],
+                [o, o, o, o, o, o, o, o, o, o, o, o, o],
+                [X, X, o, X, X, o, X, X, o, X, X, o, X],
+                [X, o, o, X, o, o, X, o, o, X, o, o, X],
+                [X, X, o, X, X, o, X, X, o, X, X, o, X],
+                [o, o, r, r, r, r, r, r, r, r, r, o, o],
             ],
             powerUps: 1,
             powerDowns: 1,
@@ -366,7 +384,9 @@ function loadLevels() {
  * @param {*} level
  */
 function printLevel(level) {
-    bricks.destroy();
+    if (bricks) {
+        bricks.destroy();
+    }
     bricks = game.add.group();
     bricks.enableBody = true;
 
@@ -381,15 +401,19 @@ function printLevel(level) {
 
                 let bID = 1;
                 if (color == 'red') {
-                    bID = 2;
+                    bID = 3;
                 } else if (color == 'blue') {
                     bID = 1;
                 } else if (color == 'orange') {
-                    bID = 3;
+                    bID = 2;
                 } else if (color == 'green') {
                     bID = 4;
                 }
-                tempBrick = bricks.create(x * 32 + 48, y * 16 + 64, 'bricks', 'brick_' + bID + '_1.png');
+                tempBrick = bricks.create(
+                    x * brickWidth + distanceWithLateralBounds,
+                    y * brickHeight + distanceWithTopBound,
+                    'bricks', 'brick_' + bID + '_1.png'
+                );
 
                 let tempCount = 0;
                 if (bricks.countLiving() > 0) {
@@ -400,8 +424,6 @@ function printLevel(level) {
 
                 tempBrick.body.bounce.setTo(1);
                 tempBrick.body.immovable = true;
-
-                tempBrick.animations.play('brick_popin');
 
                 bricks.add(tempBrick);
             }

@@ -6,7 +6,7 @@
     widthPaddle, $, heightBallPosition, heightBall,
     heightTextPosition, widthTextLivesPosition, sizeText
 */
-let game = new Phaser.Game('100%', '100%', Phaser.AUTO, 'game', {
+let game = new Phaser.Game(500, 700, Phaser.AUTO, 'game', {
     preload: preload,
     create: create,
     update: update,
@@ -28,6 +28,14 @@ let score = 0;
 let insertCoinText;
 
 let livesText;
+
+let scoreText;
+
+let countBricks = 0;
+
+let currentLevel = 0;
+
+let breakoutLevels;
 
 /**
  *
@@ -102,7 +110,7 @@ function create() {
     // </Ball>
 
     // <Text>
-    let scoreText = game.add.text(10, heightTextPosition, 'Score: 0', {
+    scoreText = game.add.text(10, heightTextPosition, 'Score: 0', {
         font: `${sizeText}px atari`,
         fill: '#ffffff',
     });
@@ -147,7 +155,8 @@ function update() {
     } else {
         game.physics.arcade.collide(ball, paddle,
             collisionBallPaddle, null, this);
-        // game.physics.arcade.collide(ball, bricks, collisionBallBricks, null, this);
+        game.physics.arcade.collide(ball, bricks,
+            collisionBallBricks, null, this);
     }
 }
 
@@ -155,24 +164,24 @@ function update() {
  *
  */
 function render() {
-    game.debug.body(paddle);
-    game.debug.body(bricks);
-    game.debug.body(ball);
+    // game.debug.body(paddle);
+    // game.debug.body(bricks);
+    // game.debug.body(ball);
 }
 
 /**
- * Check this function///////////////////////////////////////////////////////////
+ *
  */
 function ballOutOfBounds() {
+    countBricks = 0;
     lives--;
     livesText.text = `Lives: ${lives}`;
 
     if (lives == 0) {
-        // gameOver();
+        gameOver();
     } else {
         ballOnPaddle = true;
-
-        ball.reset(paddle.body.x + 16, paddle.y - 16);
+        ball.reset(game.world.centerX, heightBallPosition);
     }
 }
 
@@ -193,19 +202,210 @@ function shootBall() {
  */
 function collisionBallPaddle() {
     let diff = 0;
-
+    if (countBricks > 1) {
+        score += (10 * countBricks);
+        scoreText.text = `Score: ${score}`;
+    }
+    countBricks = 0;
     if (ball.x < paddle.centerX) {
-        // Ball is on the left-hand side of the paddle
+        // Left
         diff = paddle.centerX - ball.x;
         ball.body.velocity.x = (-5 * diff);
     } else if (ball.x > paddle.x) {
-        // Ball is on the right-hand side of the paddle
+        // Right
         diff = ball.x - paddle.x;
         ball.body.velocity.x = (5 * diff);
     } else {
-        //  Ball is perfectly in the middle
-        //  Add a little random X to stop it bouncing straight up!
+        // Center
         ball.body.velocity.x = 2 + Math.random() * 8;
+    }
+}
+
+/**
+ *
+ * @param {*} _ball
+ * @param {*} brick
+ */
+function collisionBallBricks(_ball, brick) {
+    brick.kill();
+    countBricks++;
+
+    score += 10;
+    scoreText.text = `Score: ${score}`;
+
+    if (bricks.countLiving() == 0) {
+        score += 200 * lives;
+        scoreText.text = 'score: ' + score;
+        insertCoinText.text = 'NEXT LEVEL';
+        insertCoinText.visible = true;
+
+        //  Let's move the ball back to the paddle
+        ballOnPaddle = true;
+        ball.body.velocity.set(0);
+        ball.x = paddle.x + 16;
+        ball.y = paddle.y - 16;
+
+        //  And bring the bricks back from the dead :)
+        bricks.callAll('revive');
+    }
+}
+
+/**
+ *
+ */
+function gameOver() {
+    ball.body.velocity.setTo(0, 0);
+    insertCoinText.text = 'Game Over!';
+    insertCoinText.visible = true;
+}
+
+/**
+ *
+ */
+function loadLevels() {
+    currentLevel = 0;
+
+    let r = 'red';
+    let b = 'blue';
+    let o = 'orange';
+    let g = 'green';
+    let X = null;
+
+    // you can uncoment the dev level and or/add a level of your own
+    // powerUps are not picked from the values bellow but set
+    // with: this.dropItemLimit
+    breakoutLevels = [
+        {
+            name: 'letsa begin',
+            bricks: [
+                [r, r, r, r, r, r, r, r, r],
+                [X, X, r, X, X, r, X, X, r],
+                [X, r, r, X, r, r, X, r, r],
+                [X, X, r, X, X, r, X, X, r],
+                [g, g, g, g, g, g, g, g, g],
+                [X, X, g, X, X, g, X, X, g],
+                [X, g, g, X, g, g, X, g, g],
+                [X, X, g, X, X, g, X, X, g],
+                [o, o, o, o, o, o, o, o, o],
+                [X, X, o, X, X, o, X, X, o],
+                [X, o, o, X, o, o, X, o, o],
+                [X, X, o, X, X, o, X, X, o],
+            ],
+            powerUps: 1,
+            powerDowns: 1,
+        },
+        {
+            name: 'how\'s it going?',
+            bricks: [
+                [r, r, r, r, r, r, r, r, r, r, r, r, r],
+                [r, X, X, X, X, X, X, X, X, X, X, X, r],
+                [r, X, o, o, o, o, o, o, o, o, o, X, r],
+                [r, X, X, X, X, X, o, X, X, X, X, X, r],
+                [r, r, r, r, X, X, o, X, X, r, r, r, r],
+                [X, X, X, X, X, X, o, X, X, X, X, X, X],
+                [r, r, r, r, X, X, o, X, X, r, r, r, r],
+                [r, X, X, X, X, X, o, X, X, X, X, X, r],
+                [r, X, b, b, b, b, o, b, b, b, b, X, r],
+                [r, X, X, X, X, X, X, X, X, X, X, X, r],
+                [r, X, g, g, g, g, X, g, g, g, g, X, r],
+                [r, X, g, X, X, g, X, g, X, X, g, X, r],
+                [r, X, g, g, X, g, X, g, X, g, g, X, r],
+                [r, X, X, X, X, g, X, g, X, X, X, X, r],
+                [r, X, g, g, g, g, X, g, g, g, g, X, r],
+            ],
+            powerUps: 1,
+            powerDowns: 1,
+        },
+        {
+            name: 'tie fighta!',
+            bricks: [
+                [X, X, X, X, r, X, X, X, r, X, X, X, X],
+                [X, X, X, r, r, X, X, X, r, r, X, X, X],
+                [X, X, r, r, X, X, b, X, X, r, r, X, X],
+                [X, r, r, X, X, X, X, X, X, X, r, r, X],
+                [X, r, X, X, X, X, b, X, X, X, X, r, X],
+                [X, r, X, X, X, b, b, b, X, X, X, r, X],
+                [X, r, X, X, b, b, o, b, b, X, X, r, X],
+                [X, r, X, X, X, b, b, b, X, X, X, r, X],
+                [X, r, X, X, X, X, b, X, X, X, X, r, X],
+                [X, r, X, X, X, X, b, X, X, X, X, r, X],
+                [X, r, r, X, X, X, X, X, X, X, r, r, X],
+                [X, X, r, r, X, X, b, X, X, r, r, X, X],
+                [X, X, X, r, r, X, X, X, r, r, X, X, X],
+                [X, X, X, X, r, X, X, X, r, X, X, X, X],
+            ],
+            powerUps: 2,
+            powerDowns: 2,
+        },
+        {
+            name: 'swirl',
+            bricks: [
+                [X, X, X, X, X, b, X, b, X, X, X, X, X],
+                [r, X, b, b, X, b, b, b, X, b, b, X, r],
+                [X, X, X, b, b, b, b, b, b, b, X, X, X],
+                [X, X, b, b, b, X, b, X, b, b, b, X, X],
+                [X, X, X, b, b, X, b, X, b, b, X, X, X],
+                [r, X, b, b, r, r, b, r, r, b, b, X, r],
+                [r, X, X, X, r, r, b, r, r, X, X, X, r],
+                [r, X, X, X, r, r, b, r, r, X, X, X, r],
+                [r, X, b, b, r, r, b, r, r, b, b, X, r],
+                [X, X, X, b, b, X, b, X, b, b, X, X, X],
+                [X, X, b, b, b, X, b, X, b, b, b, X, X],
+                [X, X, X, b, b, b, b, b, b, b, X, X, X],
+                [r, X, b, b, X, b, b, b, X, b, b, X, r],
+                [X, X, X, X, X, b, X, b, X, X, X, X, X],
+            ],
+            powerUps: 2,
+            powerDowns: 3,
+        },
+    ];
+}
+
+/**
+ * populateLevel
+ * @param {*} level
+ */
+function printLevel(level) {
+    bricks.destroy();
+    bricks = game.add.group();
+    bricks.enableBody = true;
+
+    let Level = breakoutLevels[level];
+
+    for (let y = 0; y < Level.bricks.length; ++y) {
+        for (let x = 0; x < Level.bricks[y].length; ++x) {
+            let color = Level.bricks[y][x];
+
+            if (color) {
+                let tempBrick;
+
+                let bID = 1;
+                if (color == 'red') {
+                    bID = 2;
+                } else if (color == 'blue') {
+                    bID = 1;
+                } else if (color == 'orange') {
+                    bID = 3;
+                } else if (color == 'green') {
+                    bID = 4;
+                }
+                tempBrick = bricks.create(x * 32 + 48, y * 16 + 64, 'bricks', 'brick_' + bID + '_1.png');
+
+                let tempCount = 0;
+                if (bricks.countLiving() > 0) {
+                    tempCount = bricks.countLiving();
+                }
+                tempBrick.name = 'brick' + (tempCount + 1);
+                tempBrick.frameName = 'brick_' + bID + '_1.png';
+
+                tempBrick.body.bounce.setTo(1);
+                tempBrick.body.immovable = true;
+
+                tempBrick.animations.play('brick_popin');
+
+                bricks.add(tempBrick);
+            }
+        }
     }
 }
 

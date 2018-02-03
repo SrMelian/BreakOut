@@ -5,3 +5,6 @@
 * {
   margin: 0;
   font-family: 'atari'; }
+
+canvas {
+  margin: 0 auto; }

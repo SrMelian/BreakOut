@@ -1,10 +1,14 @@
 /*
     globals Phaser, screenWidth, screenHeight,
     heightPaddlePosition, widthPaddlePosition, brickWidth,
-    brickHeight, distanceWithLateralBounds,
+    brickHeight, distanceWithLateralBounds, updateScore, sortUsersByScore,
     distanceWithTopBound, widthPaddle, $, heightBallPosition,
     heightBall, heightTextPosition, widthTextLivesPosition, sizeText
 */
+
+/**
+ * Variable which contain the game
+ */
 let game = new Phaser.Game(500, 700, Phaser.AUTO, 'game', {
     preload: preload,
     create: create,
@@ -12,32 +16,87 @@ let game = new Phaser.Game(500, 700, Phaser.AUTO, 'game', {
     render: render,
 });
 
+/**
+ * Object paddle
+ */
 let paddle;
 
+/**
+ * Object group bricks
+ */
 let bricks;
 
+/**
+ * Object ball
+ */
 let ball;
 
+/**
+ * Boolean which tell us if the ball is on the paddle
+ */
 let ballOnPaddle = true;
 
+/**
+ * Lives count
+ */
 let lives = 3;
 
+/**
+ * Store the score
+ */
 let score = 0;
 
+/**
+ * Object text from Phaser, store the initial text
+ */
 let insertCoinText;
 
+/**
+ * Object text from Phaser, store the lives text
+ */
 let livesText;
 
+/**
+ * Object text from Phaser, store the score text
+ */
 let scoreText;
 
+/**
+ * Store the brick's count, since the ball is out the paddle, until the ball
+ * return the paddle. Use it to apply the bonus
+ */
 let countBricks = 0;
 
 let currentLevel = 0;
 
+/**
+ * Object which contains the level structure, is loaded in loadLevels function
+ */
 let breakoutLevels;
 
 /**
- *
+ * Object audio from Phaser, which store the sound of a brick death
+ */
+let brickDeath;
+
+/**
+ * Object audio from Phaser, which store the sound when the ball hit the paddle
+ */
+let numKey;
+
+/**
+ * Object audio from Phaser, which store the sound of Game Over
+ */
+let playerDeath;
+
+/**
+ * Object audio from Phaser, which store the sound of background
+ */
+let backgroundMusic;
+
+/**
+ * Load all the resources needed by the game
+ * Sprites, audios and levels
  */
 function preload() {
     game.load.atlas('bricks', 'resources/breakout.png',
@@ -46,18 +105,41 @@ function preload() {
     game.load.image('paddle', 'resources/paddle.png');
     game.load.bitmapFont('atari',
         'resources/Atari.png', 'resources/Atari.fnt');
+
+    game.load.audio('brickDeath', [
+        'resources/sfx/brickDeath.mp3',
+        'resources/sfx/brickDeath.ogg',
+        'resources/sfx/brickDeath.wav',
+    ]);
+    game.load.audio('numKey', [
+        'resources/sfx/numkey.wav',
+    ]);
+    game.load.audio('playerDeath', [
+        'resources/sfx/player_death.wav',
+    ]);
+    game.load.audio('backgroundMusic', [
+        'resources/sfx/bodenstaendig_2000_in_rock_4bit.ogg',
+        'resources/sfx/bodenstaendig_2000_in_rock_4bit.mp3',
+    ]);
+
     loadLevels();
 }
 
 /**
- *
+ * Initialize all the elements which interact in the game
  */
 function create() {
+    // Start physics
     game.physics.startSystem(Phaser.Physics.ARCADE);
     game.physics.arcade.checkCollision.down = false;
 
+    // Add background image
     game.add.sprite(0, 0, 'background');
+
+    // Start params needed to the positions
     initializeParams();
+    createSoundsAndMusic();
+    backgroundMusic.loopFull(.5);
 
     // <Paddle>
     paddle = game.add.sprite(
@@ -119,7 +201,8 @@ function create() {
 }
 
 /**
- *
+ * Moves the bricks, update the paddle position, control the limits to the ball
+ * and listen the collides between the ball, the paddle, and bricks
  */
 function update() {
     moveBricks();
@@ -144,7 +227,7 @@ function update() {
 }
 
 /**
- *
+ * Help to see the elements body
  */
 function render() {
     // game.debug.body(paddle);
@@ -153,7 +236,8 @@ function render() {
 }
 
 /**
- *
+ * Handler if the ball out the bottom bound
+ * redirect to game over or put the ball on the paddle
  */
 function ballOutOfBounds() {
     countBricks = 0;
@@ -169,7 +253,7 @@ function ballOutOfBounds() {
 }
 
 /**
- *
+ * Fire this function when click and the ball is on the paddle
  */
 function shootBall() {
     if (ballOnPaddle) {
@@ -181,10 +265,11 @@ function shootBall() {
 }
 
 /**
- *
+ * Update the score with the bonus, and manage the bounce angle of the ball
  */
 function collisionBallPaddle() {
     let diff = 0;
+    numKey.play();
     if (countBricks > 1) {
         score += (10 * countBricks);
         scoreText.text = `Score: ${score}`;
@@ -199,19 +284,17 @@ function collisionBallPaddle() {
         diff = ball.x - paddle.x;
         ball.body.velocity.x = (8 * diff);
     }
-    // } else {
-    //     // Center
-    //     ball.body.velocity.x = 2 + Math.random() * 8;
-    // }
 }
 
 /**
- *
- * @param {*} _ball
- * @param {*} brick
+ * Kill the brick, update the score and manage the remaining number of bricks,
+ * to redirect you to the next level
+ * @param {Object} _ball Useless
+ * @param {Object} brick Kicked brick
  */
 function collisionBallBricks(_ball, brick) {
     brick.kill();
+    brickDeath.play();
     countBricks++;
 
     if (isCrazyBrick(brick)) {
@@ -236,16 +319,16 @@ function collisionBallBricks(_ball, brick) {
         ball.x = paddle.x + 16;
         ball.y = paddle.y - 16;
 
-        //  And bring the bricks back from the dead :)
+        //  And bring the bricks back from the dead
         nextLevel();
         game.input.onDown.add(shootBall, this);
     }
 }
 
 /**
- *
- * @param {*} brick
- * @return {*}
+ * If true, the ball will bounce to the random angle
+ * @param {Object} brick Kicked brick
+ * @return {boolean}
  */
 function isCrazyBrick(brick) {
     let isCrazy = false;
@@ -258,7 +341,8 @@ function isCrazyBrick(brick) {
 }
 
 /**
- *
+ * Update the ranking with the current score, and manage if you win,
+ * or go to the next level
  */
 function nextLevel() {
     updateScore();
@@ -273,9 +357,10 @@ function nextLevel() {
 }
 
 /**
- *
+ * Update the ranking, and put the game in state of GameOver, you can't no play
  */
 function gameOver() {
+    playerDeath.play();
     updateScore();
     sortUsersByScore();
     ball.body.velocity.setTo(0, 0);
@@ -284,7 +369,7 @@ function gameOver() {
 }
 
 /**
- *
+ * Put the game in state of Win, you can't no play
  */
 function gameWin() {
     ball.body.velocity.setTo(0, 0);
@@ -296,7 +381,7 @@ function gameWin() {
 }
 
 /**
- *
+ * Draw and load the array with the levels
  */
 function loadLevels() {
     currentLevel = 0;
@@ -346,8 +431,6 @@ function loadLevels() {
                 [X, X, o, X, X, o, X, X, o, X, X, o, X],
                 [o, o, c, c, c, c, c, c, c, c, c, o, o],
             ],
-            powerUps: 1,
-            powerDowns: 1,
         },
         {
             name: 'how\'s it going?',
@@ -368,8 +451,6 @@ function loadLevels() {
                 [r, X, X, X, X, g, X, g, X, X, X, X, r],
                 [r, X, g, g, g, g, X, g, g, g, g, X, r],
             ],
-            powerUps: 1,
-            powerDowns: 1,
         },
         {
             name: 'tie fighta!',
@@ -389,8 +470,6 @@ function loadLevels() {
                 [X, X, X, r, r, X, X, X, r, r, X, X, X],
                 [X, X, X, X, r, X, X, X, r, X, X, X, X],
             ],
-            powerUps: 2,
-            powerDowns: 2,
         },
         {
             name: 'swirl',
@@ -410,15 +489,13 @@ function loadLevels() {
                 [r, X, b, b, X, b, b, b, X, b, b, X, r],
                 [X, X, X, X, X, b, X, b, X, X, X, X, X],
             ],
-            powerUps: 2,
-            powerDowns: 3,
         },
     ];
 }
 
 /**
- * populateLevel
- * @param {*} level
+ * Read the level, and print it, also prepares them to read the brick name
+ * @param {Integer} level Level which wants print
  */
 function printLevel(level) {
     if (bricks) {
@@ -469,7 +546,8 @@ function printLevel(level) {
 }
 
 /**
- *
+ * Animation to moves the bricks
+ * When the bricks is on the 0 x position, go to the right and vice versa
  */
 function moveBricks() {
     if (bricks.x == 0) {
@@ -486,7 +564,7 @@ function moveBricks() {
 }
 
 /**
- *
+ * Put all the vars and objects to 0, and initial position to retry the game
  */
 function retry() {
     ball.reset(game.world.centerX, heightBallPosition);
@@ -505,6 +583,45 @@ function retry() {
 }
 
 /**
+ * Load the sounds vars
+ */
+function createSoundsAndMusic() {
+    brickDeath = game.add.audio('brickDeath');
+    numKey = game.add.audio('numKey');
+    playerDeath = game.add.audio('playerDeath');
+    backgroundMusic = game.add.audio('backgroundMusic');
+}
+
+/**
+ * Toggle the music mute
+ */
+function mute() {
+    if (!backgroundMusic.mute) {
+        backgroundMusic.mute = true;
+    } else {
+        backgroundMusic.mute = false;
+    }
+
+    if (!brickDeath.mute) {
+        brickDeath.mute = true;
+    } else {
+        brickDeath.mute = false;
+    }
+
+    if (!numKey.mute) {
+        numKey.mute = true;
+    } else {
+        numKey.mute = false;
+    }
+
+    if (!playerDeath.mute) {
+        playerDeath.mute = true;
+    } else {
+        playerDeath.mute = false;
+    }
+}
+
+/**
  * Function called when the canvas was defined, and initialize the
  * globals params
  */
@@ -515,9 +632,6 @@ function initializeParams() {
     screenHeight = board.height;
 
     heightPaddlePosition = screenHeight - (screenHeight * 0.25);
-
-    // Columns number according
-    columns = Math.floor(screenWidth / brickWidth) - 2;
 
     // Distance from bricks to the left and right bounds
     let decPart = (screenWidth / brickWidth + '').split('.')[1];
@@ -538,10 +652,10 @@ function initializeParams() {
 }
 
 /**
- *
- * @param {*} min
- * @param {*} max
- * @return {*}
+ * Get a random
+ * @param {Integer} min Min number, included
+ * @param {Integer} max Max number, excluded
+ * @return {Integer} Random number between the params
  */
 function getRandomInt(min, max) {
     return Math.floor(Math.random() * (max - min)) + min;

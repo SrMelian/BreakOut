@@ -1,33 +1,67 @@
 /*
-    globals $, score
+    globals $, score, retry, mute
 */
 
+/**
+ * Array which contains the array with users
+ */
 let usersJson = [];
 
+/**
+ * Position in the array from the current user
+ */
 let userId;
 
+/**
+ * Load the name user
+ */
 let name;
 
+/**
+ * Load the title user
+ */
 let title;
 
+/**
+ * Load the email user
+ */
 let email;
 
+/**
+ * Load the avatar user
+ */
 let avatar;
 
+/**
+ * Initial modal, Sign Up form
+ */
 let $modalForm;
 
+/**
+ * Modal with the users ranking
+ */
 let $modalRanking;
 
+/**
+ * Warning modal which appears when you try retry the game
+ */
 let $modalRetry;
+
+/**
+ * Button to toggle the music mute
+ */
+let $mute;
 
 $(document).ready(function() {
     $modalForm = $('#modalForm');
     $modalRanking = $('#modalRanking');
     $modalRetry = $('#modalWarningRetry');
+    $mute = $('#mute');
 
     initializeModals();
 
     $modalForm.modal('open');
+    // Initialize selects
     $('select').material_select();
 
     // Handlers to submit the form
@@ -41,6 +75,7 @@ $(document).ready(function() {
         }
     });
 
+    // Listeners to the form submit, and the click on retry
     $form.on('submit', function(event) {
         event.preventDefault();
         event.stopPropagation();
@@ -62,15 +97,23 @@ $(document).ready(function() {
         updateScore();
         sortUsersByScore();
     });
-
     $modalRetry.find('#retry').on('click', function() {
         retry();
         $modalRetry.modal('close');
     });
+    $mute.on('click', function() {
+        mute();
+        let icon = $(this).find('i');
+        if (icon.text() != 'volume_mute' ) {
+            icon.text('volume_mute');
+        } else {
+            icon.text('volume_up');
+        }
+    });
 });
 
 /**
- *
+ * Set the modal params
  */
 function initializeModals() {
     $modalForm.modal({
@@ -100,7 +143,8 @@ function initializeModals() {
 }
 
 /**
- *
+ * Push in the users array, the current user and upload to LocalStorage
+ * This function is called from the form submit
  */
 function registerUser() {
     usersJson.push({
@@ -115,7 +159,9 @@ function registerUser() {
 }
 
 /**
- *
+ * Update the score to the current user
+ * This function is called when yo pass to the next level, when you win,
+ * and when you lose
  */
 function updateScore() {
     usersJson = downFromLocalStorage('users');
@@ -124,7 +170,7 @@ function updateScore() {
 }
 
 /**
- *
+ * Sort all the array according the score, major to minor
  */
 function sortUsersByScore() {
     usersJson = downFromLocalStorage('users');
@@ -144,7 +190,7 @@ function sortUsersByScore() {
 }
 
 /**
- *
+ * Load the navbar with the current user data
  */
 function loadNavBar() {
     $('#avatarContent').attr('src', `resources/avatar_${avatar}.png`);
@@ -152,7 +198,7 @@ function loadNavBar() {
 }
 
 /**
- *
+ * Load the modal ranking with the HTML
  */
 function loadRanking() {
     let $container = $modalRanking.find('.collection');
@@ -180,19 +226,19 @@ function loadRanking() {
 }
 
 /**
- *
- * @param {*} item
- * @return {*}
+ * Download the localStorage a item, no check if exist
+ * @param {String} item to download
+ * @return {Object}
  */
 function downFromLocalStorage(item) {
     return JSON.parse(localStorage.getItem(item));
 }
 
 /**
- *
- * @param {*} element
- * @param {*} name
+ * Upload to localStorage a item
+ * @param {Object} item to upload, will be stringify
+ * @param {String} name which will be identified the Object in the localStorage
  */
-function loadStorage(element, name) {
-    localStorage.setItem(name, JSON.stringify(element));
+function loadStorage(item, name) {
+    localStorage.setItem(name, JSON.stringify(item));
 }

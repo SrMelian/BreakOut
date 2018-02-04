@@ -1,7 +1,3 @@
-let rows = 4;
-
-let columns;
-
 let screenWidth;
 
 let screenHeight;
@@ -22,6 +18,9 @@ let brickWidth = 32;
 
 let brickHeight = 16;
 
+/**
+ * Brick's distance with the lateral world bounds
+ */
 let distanceWithLateralBounds;
 
 /**
@@ -29,8 +28,9 @@ let distanceWithLateralBounds;
  */
 let distanceWithTopBound;
 
-let distanceBetweenBricks = 30;
-
+/**
+ * On the paddle
+ */
 let heightBallPosition;
 
 let heightBall = 16;

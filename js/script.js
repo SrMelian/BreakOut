@@ -14,9 +14,11 @@ let email;
 
 let avatar;
 
+let $modalRanking;
+
 $(document).ready(function() {
     let $modalForm = $('#modalForm');
-    let $modalRanking = $('#modalRanking');
+    $modalRanking = $('#modalRanking');
 
     $modalForm.modal({
         dismissible: false,
@@ -34,7 +36,7 @@ $(document).ready(function() {
         startingTop: '4%',
         endingTop: '10%',
     });
-    $modalForm.modal('open');
+    // $modalForm.modal('open');
     $('select').material_select();
 
     // Handlers to submit the form
@@ -118,6 +120,33 @@ function sortUsersByScore() {
 function loadNavBar() {
     $('#avatarContent').attr('src', `resources/avatar_${avatar}.png`);
     $('#nameContent').text(`${name} ${title}`);
+}
+
+/**
+ *
+ */
+function loadRanking() {
+    let $container = $modalRanking.find('.collection');
+    let cont = 1;
+    for (const key in usersJson) {
+        if (usersJson.hasOwnProperty(key)) {
+            const element = usersJson[key];
+            let $html = $(
+                `<li class="collection-item avatar">
+                    <img src="${element.avatar}" class="circle">
+                    <span class="title">${element.name}</span>
+                    <p>
+                        ${element.title}
+                        <br/>
+                        #${cont}
+                    </p>
+                    <a class="secondary-content">${element.score} puntos</a>
+                </li>`
+            );
+            $container.append($html);
+        }
+        cont++;
+    }
 }
 
 /**

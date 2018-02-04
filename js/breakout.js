@@ -288,7 +288,9 @@ function gameOver() {
  *
  */
 function gameWin() {
-
+    ball.body.velocity.setTo(0, 0);
+    insertCoinText.text = 'You Win!';
+    insertCoinText.visible = true;
 }
 
 /**

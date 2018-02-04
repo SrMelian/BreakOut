@@ -194,15 +194,16 @@ function collisionBallPaddle() {
     if (ball.x < paddle.centerX) {
         // Left
         diff = paddle.centerX - ball.x;
-        ball.body.velocity.x = (-5 * diff);
+        ball.body.velocity.x = (-8 * diff);
     } else if (ball.x > paddle.x) {
         // Right
         diff = ball.x - paddle.x;
-        ball.body.velocity.x = (5 * diff);
-    } else {
-        // Center
-        ball.body.velocity.x = 2 + Math.random() * 8;
+        ball.body.velocity.x = (8 * diff);
     }
+    // } else {
+    //     // Center
+    //     ball.body.velocity.x = 2 + Math.random() * 8;
+    // }
 }
 
 /**
@@ -210,10 +211,17 @@ function collisionBallPaddle() {
  * @param {*} _ball
  * @param {*} brick
  */
-function collisionBallBricks(_ball, brick) {
+function collisionBallBricks(_ball, brick) { // 0 y 180
     brick.kill();
     countBricks++;
 
+    if (isCrazyBrick(brick)) {
+        let random;
+        do {
+            random = getRandomInt(0, 361);
+        } while (random == 0 || random == 180);
+        game.physics.arcade.velocityFromAngle(random, 300, ball.body.velocity);
+    }
     score += 10;
     scoreText.text = `Score: ${score}`;
 
@@ -233,6 +241,21 @@ function collisionBallBricks(_ball, brick) {
         nextLevel();
         game.input.onDown.add(shootBall, this);
     }
+}
+
+/**
+ *
+ * @param {*} brick
+ * @return {*}
+ */
+function isCrazyBrick(brick) {
+    let isCrazy = false;
+    let arrayFrameName = brick.frameName.split('_');
+
+    if (arrayFrameName[1] == '5') {
+        isCrazy = true;
+    }
+    return isCrazy;
 }
 
 /**
@@ -267,6 +290,7 @@ function loadLevels() {
     let b = 'blue';
     let o = 'orange';
     let g = 'green';
+    let c = 'crazy';
     let X = null;
 
     // you can uncoment the dev level and or/add a level of your own
@@ -288,7 +312,7 @@ function loadLevels() {
                 [X, X, o, X, X, o, X, X, o, X, X, o, X],
                 [X, o, o, X, o, o, X, o, o, X, o, o, X],
                 [X, X, o, X, X, o, X, X, o, X, X, o, X],
-                [o, o, r, r, r, r, r, r, r, r, r, o, o],
+                [o, o, c, c, c, c, c, c, c, c, c, o, o],
             ],
             powerUps: 1,
             powerDowns: 1,
@@ -383,8 +407,8 @@ function printLevel(level) {
                 let bID = 1;
                 if (color == 'red') {
                     bID = 3;
-                } else if (color == 'blue') {
-                    bID = 1;
+                } else if (color == 'crazy') {
+                    bID = 5;
                 } else if (color == 'orange') {
                     bID = 2;
                 } else if (color == 'green') {
@@ -460,4 +484,14 @@ function initializeParams() {
     heightTextPosition = screenHeight - sizeText - 10;
 
     widthTextLivesPosition = screenWidth - sizeText * 8.5;
+}
+
+/**
+ *
+ * @param {*} min
+ * @param {*} max
+ * @return {*}
+ */
+function getRandomInt(min, max) {
+    return Math.floor(Math.random() * (max - min)) + min;
 }

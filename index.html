@@ -6,16 +6,125 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
 
-    <script src="http://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
-        crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/css/materialize.min.css">
     <link rel="stylesheet" href="css/style.css">
 
     <title>BreakOut</title>
 </head>
 
 <body>
+    <nav>
+        <div class="nav-wrapper indigo darken-3">
+            <a href="#" class="brand-logo right">BreakOut</a>
+            <ul id="nav-mobile" class="left hide-on-med-and-down">
+                <li>
+                    <img id="avatarContent" src="resources/avatar_1.png" width="64" />
+                </li>
+                <li>
+                    <a id="nameContent">Biblo Baggins</a>
+                </li>
+                <li>
+                    <a class="waves-effect waves-light modal-trigger btn" data-target="modalRanking">Ranking</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <div id="modalForm" class="modal">
+        <div class="modal-content">
+            <h4>Bienvenido!</h4>
+            <div class="row">
+                <form id="signForm" class="col s12">
+                    <div class="row">
+                        <div class="input-field col s6">
+                            <input placeholder="Bilbo" id="name" type="text" class="validate" required="">
+                            <label for="name" data-error="Introduzca un nombre válido" data-success="Perfecto!">Nombre</label>
+                        </div>
+                        <div class="input-field col s6">
+                            <input placeholder="Jinete de Barriles" id="title" type="text" class="validate" required="">
+                            <label for="title" data-error="Introduzca un título válido" data-success="Perfecto!">Título</label>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="input-field col s12">
+                            <input placeholder="bilboBolson@laComarca.tm" id="email" type="email" class="validate" required="" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,3}$">
+                            <label for="email" data-error="Introduzca un email válido" data-success="Perfecto!">Email</label>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="input-field col s12">
+                            <select id="avatar">
+                                <option value="1" data-icon="resources/avatar_1.png" class="left circle">Fili</option>
+                                <option value="2" data-icon="resources/avatar_2.png" class="left circle">Thranduil</option>
+                                <option value="3" data-icon="resources/avatar_3.png" class="left circle">Legolas</option>
+                                <option value="4" data-icon="resources/avatar_4.png" class="left circle">Kili</option>
+                                <option value="5" data-icon="resources/avatar_5.png" class="left circle">Thorin</option>
+                            </select>
+                            <label for="avatar">Escoja su avatar</label>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <a id="submit" class="waves-effect waves-green btn-flat">Jugar!</a>
+        </div>
+    </div>
+
+    <div id="modalRanking" class="modal bottom-sheet">
+        <div class="modal-content">
+            <h4>Ranking Top 10</h4>
+            <ul class="collection">
+                <li class="collection-item avatar">
+                    <img src="images/yuna.jpg" alt="" class="circle">
+                    <span class="title">Title</span>
+                    <p>First Line
+                        <br> Second Line
+                    </p>
+                    <a href="#!" class="secondary-content">
+                        <i class="material-icons">grade</i>
+                    </a>
+                </li>
+                <li class="collection-item avatar">
+                    <i class="material-icons circle">folder</i>
+                    <span class="title">Title</span>
+                    <p>First Line
+                        <br> Second Line
+                    </p>
+                    <a href="#!" class="secondary-content">
+                        <i class="material-icons">grade</i>
+                    </a>
+                </li>
+                <li class="collection-item avatar">
+                    <i class="material-icons circle green">assessment</i>
+                    <span class="title">Title</span>
+                    <p>First Line
+                        <br> Second Line
+                    </p>
+                    <a href="#!" class="secondary-content">
+                        <i class="material-icons">grade</i>
+                    </a>
+                </li>
+                <li class="collection-item avatar">
+                    <i class="material-icons circle red">play_arrow</i>
+                    <span class="title">Title</span>
+                    <p>First Line
+                        <br> Second Line
+                    </p>
+                    <a href="#!" class="secondary-content">
+                        <i class="material-icons">grade</i>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <script src="http://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+        crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/js/materialize.min.js"></script>
     <script src="js/lib/phaser.min.js"></script>
     <script src="js/params.js"></script>
+    <script src="js/script.js"></script>
     <script src="js/breakout.js"></script>
 </body>
 

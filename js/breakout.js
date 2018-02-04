@@ -211,7 +211,7 @@ function collisionBallPaddle() {
  * @param {*} _ball
  * @param {*} brick
  */
-function collisionBallBricks(_ball, brick) { // 0 y 180
+function collisionBallBricks(_ball, brick) {
     brick.kill();
     countBricks++;
 
@@ -262,6 +262,8 @@ function isCrazyBrick(brick) {
  *
  */
 function nextLevel() {
+    updateScore();
+    sortUsersByScore();
     if (currentLevel >= 3) {
         gameWin();
     }
@@ -275,9 +277,18 @@ function nextLevel() {
  *
  */
 function gameOver() {
+    updateScore();
+    sortUsersByScore();
     ball.body.velocity.setTo(0, 0);
     insertCoinText.text = 'Game Over!';
     insertCoinText.visible = true;
+}
+
+/**
+ *
+ */
+function gameWin() {
+
 }
 
 /**
@@ -293,10 +304,27 @@ function loadLevels() {
     let c = 'crazy';
     let X = null;
 
-    // you can uncoment the dev level and or/add a level of your own
-    // powerUps are not picked from the values bellow but set
-    // with: this.dropItemLimit
     breakoutLevels = [
+        // {
+        //     name: 'letsa begin',
+        //     bricks: [
+        //         [X, X, X, X, X, X, X, X, X, X, X, X, X],
+        //         [X, X, X, X, X, X, X, X, X, X, X, X, X],
+        //         [X, X, X, X, X, X, X, X, X, X, X, X, X],
+        //         [X, X, X, X, X, X, X, X, X, X, X, X, X],
+        //         [X, X, X, X, X, X, X, X, X, X, X, X, X],
+        //         [X, X, X, X, X, X, X, X, X, X, X, X, X],
+        //         [X, X, X, X, X, X, X, X, X, X, X, X, X],
+        //         [X, X, X, X, X, X, X, X, X, X, X, X, X],
+        //         [X, X, X, X, X, X, X, X, X, X, X, X, X],
+        //         [X, X, X, X, X, X, X, X, X, X, X, X, X],
+        //         [X, X, X, X, X, X, X, X, X, X, X, X, X],
+        //         [X, X, X, X, X, X, X, X, X, X, X, X, X],
+        //         [X, X, X, X, X, X, X, X, X, X, X, r, X],
+        //     ],
+        //     powerUps: 1,
+        //     powerDowns: 1,
+        // },
         {
             name: 'letsa begin',
             bricks: [

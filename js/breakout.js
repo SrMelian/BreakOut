@@ -123,6 +123,7 @@ function create() {
  *
  */
 function update() {
+    moveBricks();
     // Paddle moving
     paddle.x = game.input.x;
 
@@ -428,6 +429,17 @@ function printLevel(level) {
                 bricks.add(tempBrick);
             }
         }
+    }
+}
+
+/**
+ *
+ */
+function moveBricks() {
+    if (bricks.x == 0) {
+        game.add.tween(bricks).to( {x: distanceWithLateralBounds}, 2000, Phaser.Easing.Linear.None, true, 0, 1000, true);
+    } else if (bricks.x == distanceWithLateralBounds) {
+        game.add.tween(bricks).to( {x: -distanceWithLateralBounds}, 2000, Phaser.Easing.Linear.None, true, 0, 1000, true);
     }
 }
 

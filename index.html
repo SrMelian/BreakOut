@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
 
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/css/materialize.min.css">
     <link rel="stylesheet" href="css/style.css">
 
@@ -25,6 +26,11 @@
                 </li>
                 <li>
                     <a class="waves-effect waves-light modal-trigger btn" data-target="modalRanking">Ranking</a>
+                </li>
+                <li>
+                    <a data-target="modalWarningRetry" class="waves-effect waves-light btn tooltipped modal-trigger" data-position="bottom" data-delay="50" data-tooltip="Reintentar">
+                        <i class="material-icons">replay</i>
+                    </a>
                 </li>
             </ul>
         </div>
@@ -75,6 +81,21 @@
         <div class="modal-content">
             <h4>Ranking Top 10</h4>
             <ul class="collection"></ul>
+        </div>
+    </div>
+
+    <div id="modalWarningRetry" class="modal">
+        <div class="modal-content">
+            <h4>Cuidado!</h4>
+            <p>
+                Si reintentas la partida se sobreescribirán los puntos almacenados.
+                <br/><br/>
+                Si hiciste buena partida, deberías refrescar la página y jugar como otro usuario.
+            </p>
+        </div>
+        <div class="modal-footer">
+            <a href="#" class="modal-action modal-close waves-effect waves-red btn-flat ">Cancelar</a>
+            <a id="retry" class="modal-action modal-close waves-effect waves-green btn-flat">Reintentar</a>
         </div>
     </div>
 

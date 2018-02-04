@@ -1,10 +1,9 @@
 /*
-    globals Phaser, rows, columns, screenWidth, screenHeight,
+    globals Phaser, screenWidth, screenHeight,
     heightPaddlePosition, widthPaddlePosition, brickWidth,
     brickHeight, distanceWithLateralBounds,
-    distanceWithTopBound, distanceBetweenBricks,
-    widthPaddle, $, heightBallPosition, heightBall,
-    heightTextPosition, widthTextLivesPosition, sizeText
+    distanceWithTopBound, widthPaddle, $, heightBallPosition,
+    heightBall, heightTextPosition, widthTextLivesPosition, sizeText
 */
 let game = new Phaser.Game(500, 700, Phaser.AUTO, 'game', {
     preload: preload,
@@ -291,6 +290,9 @@ function gameWin() {
     ball.body.velocity.setTo(0, 0);
     insertCoinText.text = 'You Win!';
     insertCoinText.visible = true;
+    ball.visible = false;
+    paddle.visible = false;
+    bricks.visible = false;
 }
 
 /**
@@ -481,6 +483,25 @@ function moveBricks() {
             2000, Phaser.Easing.Linear.None, true, 0, 1000, true
         );
     }
+}
+
+/**
+ *
+ */
+function retry() {
+    ball.reset(game.world.centerX, heightBallPosition);
+    ballOnPaddle = true;
+    lives = 3;
+    livesText.text = 'Lives: 3';
+    score = 0;
+    scoreText.text = 'Score: 0';
+    insertCoinText.text = 'INSERT COIN';
+    insertCoinText.visible = true;
+    currentLevel = 0;
+    ball.visible = true;
+    paddle.visible = true;
+    bricks.visible = true;
+    printLevel(0);
 }
 
 /**

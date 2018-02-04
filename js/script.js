@@ -14,28 +14,19 @@ let email;
 
 let avatar;
 
+let $modalForm;
+
 let $modalRanking;
 
-$(document).ready(function() {
-    let $modalForm = $('#modalForm');
-    $modalRanking = $('#modalRanking');
+let $modalRetry;
 
-    $modalForm.modal({
-        dismissible: false,
-        opacity: 1,
-        inDuration: 300,
-        outDuration: 200,
-        startingTop: '4%',
-        endingTop: '10%',
-    });
-    $modalRanking.modal({
-        dismissible: true,
-        opacity: .5,
-        inDuration: 300,
-        outDuration: 200,
-        startingTop: '4%',
-        endingTop: '10%',
-    });
+$(document).ready(function() {
+    $modalForm = $('#modalForm');
+    $modalRanking = $('#modalRanking');
+    $modalRetry = $('#modalWarningRetry');
+
+    initializeModals();
+
     $modalForm.modal('open');
     $('select').material_select();
 
@@ -68,8 +59,45 @@ $(document).ready(function() {
             loadNavBar();
             $modalForm.modal('close');
         }
+        updateScore();
+        sortUsersByScore();
+    });
+
+    $modalRetry.find('#retry').on('click', function() {
+        retry();
+        $modalRetry.modal('close');
     });
 });
+
+/**
+ *
+ */
+function initializeModals() {
+    $modalForm.modal({
+        dismissible: false,
+        opacity: 1,
+        inDuration: 300,
+        outDuration: 200,
+        startingTop: '4%',
+        endingTop: '10%',
+    });
+    $modalRanking.modal({
+        dismissible: true,
+        opacity: .5,
+        inDuration: 300,
+        outDuration: 200,
+        startingTop: '4%',
+        endingTop: '10%',
+    });
+    $modalRetry.modal({
+        dismissible: true,
+        opacity: .5,
+        inDuration: 300,
+        outDuration: 200,
+        startingTop: '4%',
+        endingTop: '10%',
+    });
+}
 
 /**
  *
@@ -129,6 +157,7 @@ function loadNavBar() {
 function loadRanking() {
     let $container = $modalRanking.find('.collection');
     let cont = 1;
+    $container.empty();
     for (const key in usersJson) {
         if (usersJson.hasOwnProperty(key)) {
             const element = usersJson[key];

@@ -36,7 +36,7 @@ $(document).ready(function() {
         startingTop: '4%',
         endingTop: '10%',
     });
-    // $modalForm.modal('open');
+    $modalForm.modal('open');
     $('select').material_select();
 
     // Handlers to submit the form
@@ -112,6 +112,7 @@ function sortUsersByScore() {
         return 0;
     });
     loadStorage(usersJson, 'users');
+    loadRanking();
 }
 
 /**

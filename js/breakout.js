@@ -276,26 +276,6 @@ function loadLevels() {
         {
             name: 'letsa begin',
             bricks: [
-                [X, X, X, X, X, X, X, X, X, X, X, X, X],
-                [X, X, X, X, X, X, X, X, X, X, X, X, X],
-                [X, X, X, X, X, X, X, X, X, X, X, X, X],
-                [X, X, X, X, X, X, X, X, X, X, X, X, X],
-                [X, X, X, X, X, X, X, X, X, X, X, X, X],
-                [X, X, X, X, X, X, X, X, X, X, X, X, X],
-                [X, X, X, X, X, X, X, X, X, X, X, X, X],
-                [X, X, X, X, X, X, X, X, X, X, X, X, X],
-                [X, X, X, X, X, X, X, X, X, X, X, X, X],
-                [X, X, X, X, X, X, X, X, X, X, X, X, X],
-                [X, X, X, X, X, X, X, X, X, X, X, X, X],
-                [X, X, X, X, X, X, X, X, X, X, X, X, X],
-                [X, X, X, X, X, X, X, X, X, X, X, o, X],
-            ],
-            powerUps: 1,
-            powerDowns: 1,
-        },
-        {
-            name: 'letsa begin',
-            bricks: [
                 [r, r, r, r, r, r, r, r, r, r, r, r, r],
                 [X, X, r, X, X, r, X, X, r, X, X, r, X],
                 [X, r, r, X, r, r, X, r, r, X, r, r, X],
@@ -437,9 +417,15 @@ function printLevel(level) {
  */
 function moveBricks() {
     if (bricks.x == 0) {
-        game.add.tween(bricks).to( {x: distanceWithLateralBounds}, 2000, Phaser.Easing.Linear.None, true, 0, 1000, true);
+        game.add.tween(bricks).to(
+            {x: distanceWithLateralBounds},
+            2000, Phaser.Easing.Linear.None, true, 0, 1000, true
+        );
     } else if (bricks.x == distanceWithLateralBounds) {
-        game.add.tween(bricks).to( {x: -distanceWithLateralBounds}, 2000, Phaser.Easing.Linear.None, true, 0, 1000, true);
+        game.add.tween(bricks).to(
+            {x: -distanceWithLateralBounds},
+            2000, Phaser.Easing.Linear.None, true, 0, 1000, true
+        );
     }
 }
 
